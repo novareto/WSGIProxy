@@ -178,6 +178,7 @@ class WSGIProxyMiddleware(object):
             ('JSON', self.json_decode, True),
             ('PICKLE', self.pickle_decode, False)]:
             expect = 'HTTP_X_WSGIPROXY_%s' % prefix
+            new_headers = {}
             for key in environ:
                 if key.startswith(expect):
                     if not is_secure and not secure:
@@ -186,7 +187,8 @@ class WSGIProxyMiddleware(object):
                     key_name, value = environ[key].split(None, 1)
                     key_name = urllib.unquote(key_name)
                     value = decoder(value)
-                    environ[key_name] = value
+                    new_headers[key_name] = value
+            environ.update(new_headers)
 
     def _fixup_configured(self, environ):
         path_info = environ['PATH_INFO']
